@@ -2,7 +2,10 @@
 
 namespace App\Exceptions;
 
+use App\Helpers\Transformer;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -35,6 +38,16 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        // Validation Errors.
+        $this->renderable(function (ValidationException $e) {
+            return Transformer::failed('The given data was invalid.', $e->errors(), 422);
+        });
+
+        // Model Not Found.
+        $this->renderable(function (ModelNotFoundException $e) {
+            return Transformer::failed('Model not found.', null, 404);
         });
     }
 }

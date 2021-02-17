@@ -2,20 +2,27 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use App\Helpers\Transformer;
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class Authenticate extends Middleware
+class Authenticate
 {
     /**
-     * Get the path the user should be redirected to when they are not authenticated.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string|null
-     */
-    protected function redirectTo($request)
+    * Handle an incoming request.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @param  \Closure  $next
+    * @param  string    $guard
+    * @return mixed
+    */
+    public function handle(Request $request, Closure $next, string $guard = null)
     {
-        if (! $request->expectsJson()) {
-            return route('login');
+        if (!Auth::guard($guard)->check()) {
+            return Transformer::failed('Only for authenthicated users.', null, 403);
         }
+        
+        return $next($request);
     }
 }

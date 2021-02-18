@@ -28,6 +28,7 @@ class ConversationController extends Controller
             $conversations = Conversation::with(['receiver:id,username,avatar'])
                                             ->where('user_id', Auth::id())
                                             ->whereHas('messages')
+                                            ->orderByDesc('updated_at')
                                             ->get();
 
             $messages = Message::select('conversation_id', 'message', 'file')

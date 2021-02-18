@@ -17,6 +17,8 @@ Route::prefix('auth')->group(function () {
         
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
                 ->name('logout');
+
+        Route::patch('/last-online', [AuthenticatedSessionController::class, 'updateLastOnline']);
     });
 
     Route::middleware('guest')->group(function () {

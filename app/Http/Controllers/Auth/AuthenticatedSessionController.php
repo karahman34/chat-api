@@ -21,6 +21,24 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
+     * Update last online.
+     *
+     * @return  JsonResponse
+     */
+    public function updateLastOnline()
+    {
+        try {
+            Auth::user()->update([
+                'last_online' => now()
+            ]);
+
+            return Transformer::success('Success to update last online.');
+        } catch (\Throwable $th) {
+            return Transformer::failed('Failed to update last online.');
+        }
+    }
+
+    /**
      * Handle an incoming authentication request.
      *
      * @param  \App\Http\Requests\Auth\LoginRequest  $request

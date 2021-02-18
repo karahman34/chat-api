@@ -30,8 +30,8 @@ class ConversationsCollection extends ResourceCollection
                 'id' => $item->id,
                 'user_id' => $item->user_id,
                 'unread_messages' => $item->unread_messages,
-                'created_at' => $item->c_created_at,
-                'updated_at' => $item->c_updated_at,
+                'created_at' => $item->created_at,
+                'updated_at' => $item->updated_at,
                 'message' => $this->messages->firstWhere('conversation_id', $item->id),
                 'receiver' => [
                     'id' => $item->receiver->id,

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Helpers\Transformer;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,7 +18,7 @@ class AuthenticatedSessionController extends Controller
     */
     public function me()
     {
-        return Transformer::success('Success to get auth data.', auth()->user());
+        return Transformer::success('Success to get auth data.', new UserResource(auth()->user()));
     }
 
     /**
@@ -32,7 +33,7 @@ class AuthenticatedSessionController extends Controller
                 'last_online' => now()
             ]);
 
-            return Transformer::success('Success to update last online.');
+            return Transformer::success('Success to update last online.', Auth::user());
         } catch (\Throwable $th) {
             return Transformer::failed('Failed to update last online.');
         }
@@ -90,7 +91,7 @@ class AuthenticatedSessionController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
-            'user' => Auth::user()
+            'user' => new UserResource(auth()->user())
         ]);
     }
 }

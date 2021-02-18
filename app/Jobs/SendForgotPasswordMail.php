@@ -38,7 +38,7 @@ class SendForgotPasswordMail implements ShouldQueue
     public function handle()
     {
         $token = Str::random(32);
-        $url = $url = env('CLIENT_FORGOT_PASSWORD_URL') . '?token=' . $token . '&email=' . $this->user->email;
+        $url = $url = env('CLIENT_RESET_PASSWORD_URL') . '?token=' . $token . '&email=' . $this->user->email;
 
         DB::table('password_resets')->insert([
             'email' => $this->user->email,

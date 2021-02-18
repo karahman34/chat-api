@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Helpers\Transformer;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -30,10 +31,15 @@ class RegisteredUserController extends Controller
 
         $payload['password'] = Hash::make($payload['password']);
 
-        Auth::login($user = User::create($payload));
+        $token = Auth::login($user = User::create($payload));
 
         event(new Registered($user));
 
-        return Transformer::success('Success to create new user.', $user, 201);
+        return Transformer::success('Success to create new user.', [
+        	'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60,
+            'user' => new UserResource(auth()->user())
+        ], 201);
     }
 }

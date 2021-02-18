@@ -83,7 +83,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function getAvatarUrl()
     {
         return is_null($this->avatar)
-            ? null
+            ? config('app.url') . '/default/avatar.png'
             : Storage::url($this->avatar);
     }
 }

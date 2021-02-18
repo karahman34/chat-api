@@ -16,7 +16,7 @@ class CreateMessagesTable extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('conversation_id')->nullable()->constrained('conversations')->onDelete('set null');
-            $table->text('message');
+            $table->text('message')->nullable();
             $table->string('file')->nullable();
             $table->enum('sender', ['me', 'receiver']);
             $table->timestamps();

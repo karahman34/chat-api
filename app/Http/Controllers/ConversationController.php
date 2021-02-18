@@ -30,7 +30,7 @@ class ConversationController extends Controller
                                             ->whereHas('messages')
                                             ->get();
 
-            $messages = Message::select('conversation_id', 'message')
+            $messages = Message::select('conversation_id', 'message', 'file')
                                     ->whereIn('conversation_id', [$conversations->pluck('id')])
                                     ->orderByDesc('created_at')
                                     ->get();
@@ -120,10 +120,14 @@ class ConversationController extends Controller
     public function addMessage(Request $request)
     {
         $request->validate([
-            'message' => 'required|string',
-            'file' => 'nullable|file|max:16.384',
+            'message' => 'nullable|string',
+            'file' => 'nullable|file|max:16384',
             'receiver_id' => 'required|string'
         ]);
+
+        if (strlen($request->input('message')) === 0 && !$request->hasFile('file')) {
+            return Transformer::failed('The message or file field should be present.', null, 422);
+        }
 
         try {
             $payload = $request->only('message', 'receiver_id');

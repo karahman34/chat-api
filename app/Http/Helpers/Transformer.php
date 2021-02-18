@@ -5,6 +5,22 @@ namespace App\Helpers;
 class Transformer
 {
     /**
+     * Get meta.
+     *
+     * @param   bool    $success
+     * @param   string  $message
+     *
+     * @return  array
+     */
+    public static function meta(bool $success, string $message)
+    {
+        return [
+            'ok' => $success,
+            'message' => $message,
+        ];
+    }
+    
+    /**
      * Success Json Response format.
      *
      * @param   string  $message

@@ -47,6 +47,6 @@ class MessageCreated implements ShouldBroadcast, ShouldQueue
      */
     public function broadcastAs()
     {
-        return 'message.created';
+        return 'newMessage';
     }
 }

@@ -43,7 +43,8 @@ class SyncReceiverMessage implements ShouldQueue
 
         if (!$conversation) {
             $conversation = Conversation::create([
-               'user_id' => $this->receiver_id
+               'user_id' => $this->receiver_id,
+               'receiver_id' => $this->sender_id
            ]);
         }
 

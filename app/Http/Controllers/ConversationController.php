@@ -25,16 +25,19 @@ class ConversationController extends Controller
     public function index()
     {
         try {
-            $conversations = Conversation::with(['receiver:id,username,avatar'])
+            $conversations = Conversation::with(['receiver:id,username,avatar,last_online'])
                                             ->where('user_id', Auth::id())
                                             ->whereHas('messages')
                                             ->orderByDesc('updated_at')
                                             ->get();
 
-            $messages = Message::select('conversation_id', 'message', 'file')
+            $messages = collect([]);
+            if ($conversations->count() > 0) {
+                $messages = Message::select('conversation_id', 'message', 'file')
                                     ->whereIn('conversation_id', [$conversations->pluck('id')])
                                     ->orderByDesc('created_at')
                                     ->get();
+            }
 
             return (new ConversationsCollection($conversations, $messages))
                     ->additional(Transformer::meta(true, 'Success to get conversations list.'));
@@ -56,7 +59,7 @@ class ConversationController extends Controller
             $conversation = $this->getConversation($receiverId);
             $conversation->load(['messages' => function ($query) {
                 $query->orderBy('created_at');
-            }, 'user:id,username,avatar', 'receiver:id,username,avatar,last_online']);
+            }, 'receiver:id,username,avatar,last_online']);
 
             return Transformer::success('Success to get conversation.', new ConversationResource($conversation));
         } catch (\Throwable $th) {

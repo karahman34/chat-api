@@ -7,6 +7,15 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ConversationResource extends JsonResource
 {
+    private $last_message;
+
+    public function __construct($conversation, $last_message = null)
+    {
+        parent::__construct($conversation);
+
+        $this->last_message = $last_message;
+    }
+
     /**
      * Transform the resource into an array.
      *
@@ -15,17 +24,22 @@ class ConversationResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
+        $data = [
             'id' => $this->id,
-            'user' => [
-                'id' => $this->user->id,
-                'avatar' => $this->user->getAvatarUrl(),
-                'username' => $this->user->username,
-            ],
+            'user_id' => $this->user_id,
             'receiver' => new ReceiverResource($this->receiver),
             'unread_messages' => (int) $this->unread_messages,
             'created_at' => $this->created_at,
-            'messages' => new MessagesCollection($this->messages)
+            'updated_at' => $this->updated_at,
         ];
+
+        if (is_null($this->last_message)) {
+            $data['messages'] = new MessagesCollection($this->messages);
+        } else {
+            $data['messages'] = null;
+            $data['last_message'] = $this->last_message;
+        }
+
+        return $data;
     }
 }

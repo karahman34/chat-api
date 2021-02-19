@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\ConversationResource;
 use App\Http\Resources\ReceiverResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
@@ -24,16 +25,10 @@ class ConversationsCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        return $this->conversations->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'user_id' => $item->user_id,
-                'unread_messages' => $item->unread_messages,
-                'created_at' => $item->created_at,
-                'updated_at' => $item->updated_at,
-                'message' => $this->messages->firstWhere('conversation_id', $item->id),
-                'receiver' => new ReceiverResource($item->receiver)
-            ];
+        return $this->conversations->map(function ($conversation) {
+            $last_message = $this->messages->firstWhere('conversation_id', $conversation->id);
+            
+            return new ConversationResource($conversation, $last_message);
         });
     }
 }

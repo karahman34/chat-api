@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\ReceiverResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ConversationResource extends JsonResource
@@ -21,12 +22,7 @@ class ConversationResource extends JsonResource
                 'avatar' => $this->user->getAvatarUrl(),
                 'username' => $this->user->username,
             ],
-            'receiver' => [
-                'id' => $this->receiver->id,
-                'avatar' => $this->receiver->getAvatarUrl(),
-                'username' => $this->receiver->username,
-                'last_online' => $this->receiver->last_online,
-            ],
+            'receiver' => new ReceiverResource($this->receiver),
             'unread_messages' => (int) $this->unread_messages,
             'created_at' => $this->created_at,
             'messages' => new MessagesCollection($this->messages)

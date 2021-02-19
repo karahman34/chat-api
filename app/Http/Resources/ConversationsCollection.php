@@ -2,8 +2,7 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Conversation;
-use App\Models\Member;
+use App\Http\Resources\ReceiverResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class ConversationsCollection extends ResourceCollection
@@ -33,11 +32,7 @@ class ConversationsCollection extends ResourceCollection
                 'created_at' => $item->created_at,
                 'updated_at' => $item->updated_at,
                 'message' => $this->messages->firstWhere('conversation_id', $item->id),
-                'receiver' => [
-                    'id' => $item->receiver->id,
-                    'avatar' => $item->receiver->getAvatarUrl(),
-                    'username' => $item->receiver->username,
-                ]
+                'receiver' => new ReceiverResource($item->receiver)
             ];
         });
     }

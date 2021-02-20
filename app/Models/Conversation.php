@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Conversation extends Model
 {
@@ -36,6 +37,15 @@ class Conversation extends Model
         return $this->hasMany(Message::class);
     }
 
+    /**
+     * Get last message.
+     * 
+     * @return HasOne
+     */
+    public function lastMessage()
+    {
+        return $this->hasOne(Message::class)->latest();
+    }
 
     /**
      * Get Receiver Model.

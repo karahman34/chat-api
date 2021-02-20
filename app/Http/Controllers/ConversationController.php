@@ -7,6 +7,7 @@ use App\Helpers\Transformer;
 use App\Http\Resources\ConversationResource;
 use App\Http\Resources\ConversationsCollection;
 use App\Http\Resources\MessageResource;
+use App\Http\Resources\MessagesCollection;
 use App\Jobs\SyncReceiverMessage;
 use App\Models\Conversation;
 use App\Models\Message;
@@ -25,21 +26,18 @@ class ConversationController extends Controller
     public function index()
     {
         try {
-            $conversations = Conversation::with(['receiver:id,username,avatar,last_online'])
+            $conversations = Conversation::with(['lastMessage', 'receiver:id,username,avatar,last_online'])
+                                            ->addSelect([
+                                                'message_created_at' => Message::select('created_at')
+                                                                                    ->whereColumn('conversations.id', 'conversation_id')
+                                                                                    ->limit(1)
+                                                                                    ->latest()
+                                            ])
                                             ->where('user_id', Auth::id())
-                                            ->whereHas('messages')
-                                            ->orderByDesc('updated_at')
+                                            ->orderBy('message_created_at', 'desc')
                                             ->get();
 
-            $messages = collect([]);
-            if ($conversations->count() > 0) {
-                $messages = Message::select('conversation_id', 'message', 'file')
-                                    ->whereIn('conversation_id', [$conversations->pluck('id')])
-                                    ->orderByDesc('created_at')
-                                    ->get();
-            }
-
-            return (new ConversationsCollection($conversations, $messages))
+            return (new ConversationsCollection($conversations))
                     ->additional(Transformer::meta(true, 'Success to get conversations list.'));
         } catch (\Throwable $th) {
             return Transformer::failed('Failed to get conversations list.');
@@ -47,7 +45,7 @@ class ConversationController extends Controller
     }
 
     /**
-     * Get conversations.
+     * Get conversation.
      *
      * @param   string|int  $receiverId
      *
@@ -57,9 +55,6 @@ class ConversationController extends Controller
     {
         try {
             $conversation = $this->getConversation($receiverId);
-            $conversation->load(['messages' => function ($query) {
-                $query->orderBy('created_at');
-            }, 'receiver:id,username,avatar,last_online']);
 
             return Transformer::success('Success to get conversation.', new ConversationResource($conversation));
         } catch (\Throwable $th) {
@@ -68,8 +63,27 @@ class ConversationController extends Controller
     }
 
     /**
+     * Get Conversation Messages.
+     *
+     * @param  Conversation $conversation
+     *
+     * @return JsonResponse
+     */
+    public function getMessages(Conversation $conversation)
+    {
+        try {
+            $messages = $conversation->messages()->orderByDesc('created_at')->paginate(10);
+
+            return (new MessagesCollection($messages))
+                            ->additional(Transformer::meta(true, 'Success to get conversation messages.'));
+        } catch (Exception $e) {
+            return Transformer::failed('Failed to get conversation messages.');
+        }
+    }
+
+    /**
      * Get receiver last online.
-     *     
+     *
      * @param  string|int $receiverId
      * @return JsonResponse
      */

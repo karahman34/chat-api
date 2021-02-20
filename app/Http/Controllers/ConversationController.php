@@ -150,7 +150,7 @@ class ConversationController extends Controller
     {
         $request->validate([
             'message' => 'nullable|string',
-            'file' => 'nullable|file|max:16384',
+            'file' => 'nullable|mimes:jpeg,jpg,png,gif|max:8192',
             'receiver_id' => 'required|string'
         ]);
 

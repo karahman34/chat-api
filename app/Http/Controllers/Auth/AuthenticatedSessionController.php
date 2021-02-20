@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Events\UpdateLastOnline;
 use App\Helpers\Transformer;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
@@ -29,9 +30,13 @@ class AuthenticatedSessionController extends Controller
     public function updateLastOnline()
     {
         try {
-            Auth::user()->update([
+            $user = Auth::user();
+
+            $user->update([
                 'last_online' => now()
             ]);
+
+            event(new UpdateLastOnline($user));
 
             return Transformer::success('Success to update last online.', Auth::user());
         } catch (\Throwable $th) {

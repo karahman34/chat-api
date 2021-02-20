@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Models\Conversation;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -16,4 +17,10 @@ use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::channel('user.{user}', function ($auth, User $user) {
     return (int) $auth->id === (int) $user->id;
+});
+
+Broadcast::channel('conversation.to.{user}', function ($auth, User $user) {
+    return Conversation::where('user_id', $auth->id)
+    					->where('receiver_id', $user->id)
+    					->exists();
 });

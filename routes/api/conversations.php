@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('conversations')->middleware(['auth'])->group(function () {
     Route::get('/', [ConversationController::class, 'index']);
     Route::get('/{receiverId}', [ConversationController::class, 'show']);
+    Route::get('/{receiverId}/last-online', [ConversationController::class, 'getReceiverLastOnline']);
 
     Route::post('/', [ConversationController::class, 'addMessage']);
 

@@ -68,6 +68,31 @@ class ConversationController extends Controller
     }
 
     /**
+     * Get receiver last online.
+     *     
+     * @param  string|int $receiverId
+     * @return JsonResponse
+     */
+    public function getReceiverLastOnline($receiverId)
+    {
+        try {
+            $conversation = Conversation::select('id', 'receiver_id')
+                                            ->with('receiver:id,last_online')
+                                            ->where('user_id', Auth::id())
+                                            ->where('receiver_id', $receiverId)
+                                            ->first();
+
+            if (!$conversation) {
+                return Transformer::failed('Conversation not found.', null, 404);
+            }
+
+            return Transformer::success('Success to get receiver last online.', $conversation->receiver->last_online);
+        } catch (Exception $e) {
+            return Transformer::failed('Failed to get receiver last online.', $conversation->receiver->last_online);
+        }
+    }
+
+    /**
      * Mark Read Messages.
      *
      * @param   Conversation  $conversation

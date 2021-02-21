@@ -23,3 +23,4 @@ Route::get('/search-people', [SearchController::class, 'searchPeople'])
 
 require __DIR__.'/auth.php';
 require __DIR__.'/api/conversations.php';
+require __DIR__.'/api/profile.php';
